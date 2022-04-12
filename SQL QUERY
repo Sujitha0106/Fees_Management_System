@@ -1,0 +1,219 @@
+
+mysql> USE FEES_MANAGEMENT_SYSTEM;
+Database changed
+mysql> CREATE TABLE STUDENT_DETAILS (ROLL_NO VARCHAR(10),NAME VARCHAR(256),DOB DATE,DEPARTMENT CHAR(10),PHONE_NO VARCHAR(10),EMAIL_ID VARCHAR(256),CONSTRAINT UC UNIQUE(PHONE_NO),CONSTRAINT PK PRIMARY KEY(ROLL_NO));
+Query OK, 0 rows affected (1.72 sec)
+mysql> CREATE TABLE ADMIN (ADMIN_ID VARCHAR(20) ,ADMIN_NAME VARCHAR(256),ROLE VARCHAR(256),DOJ DATE,CONSTRAINT PK PRIMARY KEY(ADMIN_ID));
+Query OK, 0 rows affected (1.56 sec)
+
+mysql> DESC ADMIN;
++------------+--------------+------+-----+---------+-------+
+| Field      | Type         | Null | Key | Default | Extra |
++------------+--------------+------+-----+---------+-------+
+| ADMIN_ID   | varchar(20)  | NO   | PRI | NULL    |       |
+| ADMIN_NAME | varchar(256) | YES  |     | NULL    |       |
+| ROLE       | varchar(256) | YES  |     | NULL    |       |
+| DOJ        | date         | YES  |     | NULL    |       |
++------------+--------------+------+-----+---------+-------+
+4 rows in set (0.18 sec)
+
+mysql> INSERT INTO ADMIN VALUES(AC101,'RAM','ACCOUNTANT','2019-08-05');
+ERROR 1054 (42S22): Unknown column 'AC101' in 'field list'
+mysql> INSERT INTO ADMIN VALUES('AC101','RAM','ACCOUNTANT','2019-08-05');
+Query OK, 1 row affected (0.15 sec)
+
+mysql> SELECT * FROM ADMIN;
++----------+------------+------------+------------+
+| ADMIN_ID | ADMIN_NAME | ROLE       | DOJ        |
++----------+------------+------------+------------+
+| AC101    | RAM        | ACCOUNTANT | 2019-08-05 |
++----------+------------+------------+------------+
+1 row in set (0.00 sec)
+
+
+/	Student(){
+//		System.out.println("************Fees Management System****************");
+//		System.out.println("\n              1.Add new Student");
+//		System.out.println("\n              2.View Student Details");
+//		System.out.println("\n              3.View all Student Details");
+//		System.out.println("\n              4.Exit");
+//		System.out.println("\n**********************************************************");
+//		System.out.println("\n Enter your choice:");
+//	}
+
+class Management{
+	static Connection con=null;
+	
+	public Connection dbConnect() throws Exception{
+	Class.forName("com.mysql.cj.jdbc.Driver");
+	con=(Connection)DriverManager.getConnection("jdbc:mysql://localhost:3306/FEES_MANAGEMENT_SYSTEM","root","Sujitha@02");
+	return con;
+	}
+	
+	void addStudent() throws Exception
+	{
+		Scanner sc = new Scanner(System.in);
+		Statement s=con.createStatement();
+		System.out.println("****************************************");
+		System.out.println("Enter the roll number:");
+		String ROLL_NO=sc.next();
+		sc.nextLine();
+		System.out.println("Enter the name:");
+		String NAME=sc.next();
+		sc.nextLine();
+		System.out.println("Enter the date of birth(yyyy/mm/dd):");
+		String DOB=sc.next();
+		sc.nextLine();
+		System.out.println("Enter the department:");
+		String DEPARTMENT=sc.next();
+		sc.nextLine();
+		System.out.println("Enter the phone number:");
+		String PHONE_NO=sc.next();
+		sc.nextLine();
+		System.out.println("Enter the email id:");
+		String EMAIL_ID=sc.next();
+		sc.nextLine();
+		System.out.println("Enter the quota(GQ/MQ):");
+		String QUOTA=sc.next();
+		sc.nextLine();
+		String sql="insert into STUDENT_DETAILS values('"+ROLL_NO+"','"+NAME+"','"+DOB+"','"+DEPARTMENT+"','"+PHONE_NO+"','"+EMAIL_ID+"','"+QUOTA+"')";
+		int res=s.executeUpdate(sql);
+		if(res==1) {
+		System.out.println("Inserted successfully ");
+		}
+		else {
+			System.out.println("Not inserted. Try again..!!!");
+		}
+	}
+	
+	void toviewStudent() throws Exception
+	{
+		Scanner sc = new Scanner(System.in);
+		int flag=0;
+		Statement s=con.createStatement();
+		System.out.println("Enter Your Roll number:\n");
+		String Roll_no=sc.next();
+		String sql="select * from STUDENT_DETAILS ;
+		ResultSet res=s.executeQuery(sql);
+		while(res.next()) {
+			System.out.println("Roll number: "+res.getString(1)+"\nName: "+res.getString(2)+"\nDate of Birth: "+res.getString(3)+"\nDepartment: "+res.getString(4)+"\nPHONE NUMBNER: "+res.getString(5)+"\nE-Mail Id: "+res.getString(6)+" ");
+			flag=1;
+		}
+		if(flag==0) {
+			System.out.println("Invalid Roll number..Try Again..!!!");
+	
+		}
+	}	
+	void toviewAllStudent() throws Exception
+	{
+		Scanner sc = new Scanner(System.in);
+		int flag=0;
+		Statement s=con.createStatement();
+		String sql="select * from STUDENT_DETAILS";
+		ResultSet res=s.executeQuery(sql);
+		while(res.next()) {
+			System.out.println("Roll number: "+res.getString(1)+"\nName: "+res.getString(2)+"\nDate of Birth: "+res.getString(3)+"\nDepartment: "+res.getString(4)+"\nPHONE NUMBNER: "+res.getString(5)+"\nE-Mail Id: "+res.getString(6)+"\Quota(GQ/MQ): "+res.getString(7));
+			System.out.println("_____________________________________________________________");
+		}
+	}	
+}
+
+
+
+mysql> CREATE TABLE HOSTEL_FEES_DETAILS ROLL_NO VARCHAR(10),NAME VARCHAR(256),HOSTEL_FEES BIGINT,CONSTRAINT FK1 FOREIGN KEY(ROLL_NO) REFERENCES STUDENT_DETAILS(ROLL_NO);
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'ROLL_NO VARCHAR(10),NAME VARCHAR(256),HOSTEL_FEES BIGINT,CONSTRAINT FK1 FOREIGN ' at line 1
+mysql> CREATE TABLE HOSTEL_FEES_DETAILS NAME VARCHAR(256),HOSTEL_FEES BIGINT,ROLL_NO VARCHAR(10) CONSTRAINT FK1 FOREIGN KEY(ROLL_NO) REFERENCES STUDENT_DETAILS(ROLL_NO);
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'NAME VARCHAR(256),HOSTEL_FEES BIGINT,ROLL_NO VARCHAR(10) CONSTRAINT FK1 FOREIGN ' at line 1
+mysql> CREATE TABLE HOSTEL_FEES_DETAILS NAME VARCHAR(256),HOSTEL_FEES BIGINT,ROLL_NO VARCHAR(10) CONSTRAINT FK1 FORIEGN KEY(ROLL_NO) REFERENCES STUDENT_DETAILS(ROLL_NO);
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'NAME VARCHAR(256),HOSTEL_FEES BIGINT,ROLL_NO VARCHAR(10) CONSTRAINT FK1 FORIEGN ' at line 1
+mysql> CREATE TABLE HOSTEL_FEES_DETAILS (NAME VARCHAR(256),HOSTEL_FEES BIGINT,ROLL_NO VARCHAR(10) CONSTRAINT FK1 FORIEGN KEY(ROLL_NO) REFERENCES STUDENT_DETAILS(ROLL_NO));
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'FORIEGN KEY(ROLL_NO) REFERENCES STUDENT_DETAILS(ROLL_NO))' at line 1
+mysql> CREATE TABLE HOSTEL_FEES_DETAILS (NAME VARCHAR(256),HOSTEL_FEES BIGINT,ROLL_NO VARCHAR(10) CONSTRAINT FKY FORIEGN KEY(ROLL_NO) REFERENCES STUDENT_DETAILS(ROLL_NO));
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'FORIEGN KEY(ROLL_NO) REFERENCES STUDENT_DETAILS(ROLL_NO))' at line 1
+mysql> CREATE TABLE HOSTEL_FEES_DETAILS (ROLL_NO VARCHAR(10),NAME VARCHAR(256),HOSTEL_FEES BIGINT);
+Query OK, 0 rows affected (1.43 sec)
+
+mysql> ALTER TABLE HOSTEL_FEES_DETAILS ADD CONSTRAINT FK1 FOREIGN KEY(ROLL_NO) REFERENCES STUDENT_DETAILS(ROLL_NO));
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ')' at line 1
+mysql> ALTER TABLE HOSTEL_FEES_DETAILS ADD CONSTRAINT FK1 FOREIGN KEY(ROLL_NO) REFERENCES STUDENT_DETAILS(ROLL_NO);
+Query OK, 0 rows affected (1.41 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> DESC HOSTEL_FEES_DETAILS;
++-------------+--------------+------+-----+---------+-------+
+| Field       | Type         | Null | Key | Default | Extra |
++-------------+--------------+------+-----+---------+-------+
+| ROLL_NO     | varchar(10)  | YES  | MUL | NULL    |       |
+| NAME        | varchar(256) | YES  |     | NULL    |       |
+| HOSTEL_FEES | bigint       | YES  |     | NULL    |       |
++-------------+--------------+------+-----+---------+-------+
+3 rows in set (0.20 sec)
+
+mysql> CREATE TABLE BUS_FEES_DETAILS (ROLL_NO VARCHAR(10),NAME VARCHAR(256),BUS_FEES BIGINT);
+Query OK, 0 rows affected (0.45 sec)
+
+mysql> ALTER TABLE BUS_FEES_DETAILS ADD CONSTRAINT FK1 FOREIGN KEY(ROLL_NO) REFERENCES STUDENT_DETAILS(ROLL_NO);
+ERROR 1826 (HY000): Duplicate foreign key constraint name 'FK1'
+mysql> ALTER TABLE BUS_FEES_DETAILS ADD CONSTRAINT FK2 FOREIGN KEY(ROLL_NO) REFERENCES STUDENT_DETAILS(ROLL_NO);
+Query OK, 0 rows affected (0.93 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> RENAME TABLE FEES_DETAILS TO ACADEMIC DETAILS;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'DETAILS' at line 1
+mysql> RENAME TABLE FEES_DETAILS TO ACADEMIC_DETAILS;
+Query OK, 0 rows affected (0.49 sec)
+
+mysql> SHOW TABLES;
++----------------------------------+
+| Tables_in_fees_management_system |
++----------------------------------+
+| academic_details                 |
+| admin                            |
+| bus_fees_details                 |
+| hostel_fees_details              |
+| student_details                  |
++----------------------------------+
+5 rows in set (0.07 sec)
+
+mysql> DESC ADMIN;
++------------+--------------+------+-----+---------+-------+
+| Field      | Type         | Null | Key | Default | Extra |
++------------+--------------+------+-----+---------+-------+
+| ADMIN_ID   | varchar(20)  | NO   | PRI | NULL    |       |
+| ADMIN_NAME | varchar(256) | YES  |     | NULL    |       |
+| ROLE       | varchar(256) | YES  |     | NULL    |       |
+| DOJ        | date         | YES  |     | NULL    |       |
++------------+--------------+------+-----+---------+-------+
+4 rows in set (0.01 sec)
+
+mysql> DESC ACADEMIC_DETAILS;
++------------+--------------+------+-----+----------+-------+
+| Field      | Type         | Null | Key | Default  | Extra |
++------------+--------------+------+-----+----------+-------+
+| ROLL_NO    | varchar(10)  | YES  | MUL | NULL     |       |
+| NAME       | varchar(256) | YES  |     | NULL     |       |
+| TOTAL_FEES | bigint       | YES  |     | NULL     |       |
+| PAID_FEES  | bigint       | YES  |     | 0        |       |
+| BALANCE    | bigint       | YES  |     | NULL     |       |
+| STATUS     | varchar(20)  | YES  |     | NOT PAID |       |
++------------+--------------+------+-----+----------+-------+
+6 rows in set (0.00 sec)
+
+mysql> ALTER TABLE BUS_FEES_DETAILS ADD COLUMN (PAID_FEES BIGINT,BALANCE BIGINT);
+Query OK, 0 rows affected (0.92 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE HOSTEL_FEES_DETAILS ADD COLUMN (PAID_FEES BIGINT,BALANCE BIGINT);
+Query OK, 0 rows affected (0.31 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE ACADEMIC_DETAILS DROP COLUMN STATUS;
+Query OK, 0 rows affected (2.14 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql>
+
+
+
+
+
